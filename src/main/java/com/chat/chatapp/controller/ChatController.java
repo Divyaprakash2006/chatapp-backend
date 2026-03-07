@@ -41,6 +41,7 @@ public class ChatController {
     @MessageMapping("/chat/{roomId}")
     @SendTo("/topic/{roomId}")
     public ChatMessage sendToRoom(@DestinationVariable String roomId, @Payload ChatMessage chatMessage) {
+        System.out.println("[ROOM WEB-SOCKET] Received from: " + chatMessage.getSender() + " to Room: " + roomId);
         chatMessage.setTimestamp(LocalDateTime.now());
         chatMessage.setRoomId(roomId);
 
@@ -63,6 +64,7 @@ public class ChatController {
                 aiMessage.setTimestamp(LocalDateTime.now());
 
                 // Save and Broadcast AI message
+                System.out.println("[AI-RESPONSE] Sending AI message to Room: " + roomId);
                 chatMessageRepository.save(aiMessage);
                 messagingTemplate.convertAndSend("/topic/" + roomId, aiMessage);
             });
@@ -75,6 +77,8 @@ public class ChatController {
     // 2. Handle Private Text Chat
     @MessageMapping("/chat/private")
     public void sendPrivateMessage(@Payload ChatMessage chatMessage) {
+        System.out.println("[PRIVATE WEB-SOCKET] Received from: " + chatMessage.getSender() + " to: "
+                + chatMessage.getRecipient());
         chatMessage.setTimestamp(LocalDateTime.now());
 
         // Save to Database
@@ -99,6 +103,7 @@ public class ChatController {
                 aiMessage.setType(ChatMessage.MessageType.CHAT);
                 aiMessage.setTimestamp(LocalDateTime.now());
 
+                System.out.println("[AI-RESPONSE] Sending Dedicated Gemini response to: " + chatMessage.getSender());
                 chatMessageRepository.save(aiMessage);
                 messagingTemplate.convertAndSend("/topic/messages/" + chatMessage.getSender(), aiMessage);
             });
@@ -130,6 +135,8 @@ public class ChatController {
     // 3. Handle WebRTC Video/Audio Call Signaling
     @MessageMapping("/signal")
     public void processSignaling(@Payload SignalMessage signalMessage) {
+        System.out.println("[SIGNALING] Route from: " + signalMessage.getSender() + " to: "
+                + signalMessage.getRecipient() + " Type: " + signalMessage.getType());
         // Route to recipient's personal signaling topic
         messagingTemplate.convertAndSend(
                 "/topic/signal/" + signalMessage.getRecipient(),
