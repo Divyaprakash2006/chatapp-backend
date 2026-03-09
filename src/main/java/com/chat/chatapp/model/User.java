@@ -45,5 +45,9 @@ public class User {
 
     private boolean online;
 
+    private String bio;
+
+    private String profilePicture;
+
     private boolean aiEnabled = false;
 }

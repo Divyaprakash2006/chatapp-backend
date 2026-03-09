@@ -109,4 +109,21 @@ public class AuthController {
         userRepository.save(user);
         return ResponseEntity.ok(user);
     }
+
+    @PostMapping("/update-profile")
+    public ResponseEntity<?> updateProfile(@RequestBody User profileData) {
+        Optional<User> userOpt = userRepository.findByUsername(profileData.getUsername());
+        if (userOpt.isEmpty())
+            return ResponseEntity.badRequest().body("User not found");
+
+        User user = userOpt.get();
+        if (profileData.getBio() != null)
+            user.setBio(profileData.getBio());
+        if (profileData.getProfilePicture() != null)
+            user.setProfilePicture(profileData.getProfilePicture());
+
+        userRepository.save(user);
+        user.setPassword(null);
+        return ResponseEntity.ok(user);
+    }
 }
