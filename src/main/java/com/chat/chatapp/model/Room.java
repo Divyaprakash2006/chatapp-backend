@@ -28,4 +28,7 @@ public class Room {
     private Set<User> members = new HashSet<>();
 
     private boolean aiEnabled = false;
+    private String icon;
+    private String category;
+    private String type = "COMMUNITY"; // COMMUNITY or GROUP
 }

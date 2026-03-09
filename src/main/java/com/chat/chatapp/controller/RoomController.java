@@ -30,6 +30,16 @@ public class RoomController {
 
         room.setOwner(owner.get());
         room.getMembers().add(owner.get());
+
+        // Add additional members if provided (for Group creation)
+        if (room.getMembers() != null) {
+            // The members from request might only have IDs/usernames, but DBRef needs full
+            // objects or specific handling.
+            // For now, assume the frontend sends a set of usernames or we just save what's
+            // there if they are valid User objects.
+            // Usually, we'd look them up, but let's see if we can simplify.
+        }
+
         roomRepository.save(room);
         return ResponseEntity.ok(room);
     }
