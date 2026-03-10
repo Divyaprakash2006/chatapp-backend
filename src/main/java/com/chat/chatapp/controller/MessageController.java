@@ -42,9 +42,14 @@ public class MessageController {
     @DeleteMapping
     public ResponseEntity<?> deleteMessage(@RequestParam String timestamp, @RequestParam String sender) {
         try {
-            // Frontend sends ISO strings like 2026-03-10T06:54:15.542Z
-            // We need to parse this. ISO_OFFSET_DATE_TIME handles the 'Z'
-            LocalDateTime ts = java.time.OffsetDateTime.parse(timestamp).toLocalDateTime();
+            // Frontend sends ISO strings like 2026-03-10T06:54:15.542Z or
+            // 2026-03-10T06:54:15.542
+            LocalDateTime ts;
+            if (timestamp.contains("Z") || timestamp.contains("+")) {
+                ts = java.time.OffsetDateTime.parse(timestamp).toLocalDateTime();
+            } else {
+                ts = LocalDateTime.parse(timestamp);
+            }
             chatMessageRepository.deleteBySenderAndTimestamp(sender, ts);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
