@@ -5,7 +5,8 @@ import com.chat.chatapp.repository.ChatMessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -36,5 +37,19 @@ public class MessageController {
     public ResponseEntity<?> clearPrivateHistory(@RequestParam String user1, @RequestParam String user2) {
         chatMessageRepository.deletePrivateHistory(user1, user2);
         return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping
+    public ResponseEntity<?> deleteMessage(@RequestParam String timestamp, @RequestParam String sender) {
+        try {
+            // Frontend sends ISO strings like 2026-03-10T06:54:15.542Z
+            // We need to parse this. ISO_OFFSET_DATE_TIME handles the 'Z'
+            LocalDateTime ts = java.time.OffsetDateTime.parse(timestamp).toLocalDateTime();
+            chatMessageRepository.deleteBySenderAndTimestamp(sender, ts);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            System.err.println("Delete error: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Invalid timestamp format: " + e.getMessage());
+        }
     }
 }

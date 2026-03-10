@@ -42,7 +42,9 @@ public class ChatController {
     @SendTo("/topic/{roomId}")
     public ChatMessage sendToRoom(@DestinationVariable String roomId, @Payload ChatMessage chatMessage) {
         System.out.println("[ROOM WEB-SOCKET] Received from: " + chatMessage.getSender() + " to Room: " + roomId);
-        chatMessage.setTimestamp(LocalDateTime.now());
+        if (chatMessage.getTimestamp() == null) {
+            chatMessage.setTimestamp(LocalDateTime.now());
+        }
         chatMessage.setRoomId(roomId);
 
         // Save to Database
@@ -79,7 +81,9 @@ public class ChatController {
     public void sendPrivateMessage(@Payload ChatMessage chatMessage) {
         System.out.println("[PRIVATE WEB-SOCKET] Received from: " + chatMessage.getSender() + " to: "
                 + chatMessage.getRecipient());
-        chatMessage.setTimestamp(LocalDateTime.now());
+        if (chatMessage.getTimestamp() == null) {
+            chatMessage.setTimestamp(LocalDateTime.now());
+        }
 
         // Save to Database
         if (chatMessage.getFileUrl() != null) {

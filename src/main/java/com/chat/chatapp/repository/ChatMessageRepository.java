@@ -18,4 +18,6 @@ public interface ChatMessageRepository extends MongoRepository<ChatMessage, Stri
 
     @Query(value = "{ '$or': [ { 'sender': ?0, 'recipient': ?1 }, { 'sender': ?1, 'recipient': ?0 } ] }", delete = true)
     void deletePrivateHistory(String user1, String user2);
+
+    void deleteBySenderAndTimestamp(String sender, java.time.LocalDateTime timestamp);
 }
