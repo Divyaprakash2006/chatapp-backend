@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.HashSet;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/rooms")
@@ -24,6 +26,7 @@ public class RoomController {
 
     @PostMapping("/create")
     public ResponseEntity<?> createRoom(@RequestParam String username, @RequestBody Room room) {
+        System.out.println("Create room request from " + username + ": " + room);
         Optional<User> owner = userRepository.findByUsername(username);
         if (owner.isEmpty())
             return ResponseEntity.badRequest().body("User not found");
@@ -35,12 +38,15 @@ public class RoomController {
         room.getMembers().add(owner.get());
 
         // Add additional members if provided (for Group creation)
-        if (room.getMembers() != null) {
-            // The members from request might only have IDs/usernames, but DBRef needs full
-            // objects or specific handling.
-            // For now, assume the frontend sends a set of usernames or we just save what's
-            // there if they are valid User objects.
-            // Usually, we'd look them up, but let's see if we can simplify.
+        if (room.getMembers() != null && !room.getMembers().isEmpty()) {
+            Set<User> membersToUpdate = new HashSet<>();
+            membersToUpdate.add(owner.get());
+            for (User member : room.getMembers()) {
+                if (member.getUsername() != null) {
+                    userRepository.findByUsername(member.getUsername()).ifPresent(membersToUpdate::add);
+                }
+            }
+            room.setMembers(membersToUpdate);
         }
 
         roomRepository.save(room);

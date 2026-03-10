@@ -8,11 +8,14 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.util.Set;
 import java.util.HashSet;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Document(collection = "rooms")
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Room {
     @Id
     private String id; // Unique access code
@@ -23,7 +26,7 @@ public class Room {
     private User owner;
 
     @DBRef
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Set<User> members = new HashSet<>();
 
     private boolean aiEnabled = false;

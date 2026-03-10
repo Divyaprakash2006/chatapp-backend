@@ -13,6 +13,8 @@ import java.util.Set;
 @Document(collection = "users")
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
     @Id
     private String id;

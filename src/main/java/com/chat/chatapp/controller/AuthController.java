@@ -21,6 +21,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {
+        System.out.println("Registration request for: " + user);
         // Validation
         if (user.getUsername() == null || !user.getUsername().matches("^[a-zA-Z0-9_]{3,20}$")) {
             return ResponseEntity.badRequest()
