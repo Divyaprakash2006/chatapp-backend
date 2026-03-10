@@ -29,6 +29,9 @@ public class RoomController {
             return ResponseEntity.badRequest().body("User not found");
 
         room.setOwner(owner.get());
+        if (room.getMembers() == null) {
+            room.setMembers(new HashSet<>());
+        }
         room.getMembers().add(owner.get());
 
         // Add additional members if provided (for Group creation)

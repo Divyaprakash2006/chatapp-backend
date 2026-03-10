@@ -13,7 +13,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Document(collection = "rooms")
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class Room {
     @Id
     private String id; // Unique access code
