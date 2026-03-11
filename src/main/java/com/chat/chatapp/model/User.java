@@ -10,11 +10,13 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Document(collection = "users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
     @Id
     private String id;
@@ -44,11 +46,19 @@ public class User {
     @EqualsAndHashCode.Exclude
     private Set<Room> joinedRooms = new HashSet<>();
 
-    private boolean online;
+    private Boolean online;
 
     private String bio;
 
     private String profilePicture;
 
-    private boolean aiEnabled = false;
+    private Boolean aiEnabled = false;
+
+    public boolean isAiEnabled() {
+        return aiEnabled != null && aiEnabled;
+    }
+
+    public boolean isOnline() {
+        return online != null && online;
+    }
 }

@@ -14,22 +14,55 @@ import java.util.Optional;
 public class WebSocketEventListener {
 
     @Autowired
+    private org.springframework.messaging.simp.SimpMessageSendingOperations messagingTemplate;
+
+    @Autowired
     private UserRepository userRepository;
+
+    @EventListener
+    public void handleWebSocketConnectListener(org.springframework.web.socket.messaging.SessionConnectedEvent event) {
+        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+        // Extract username from connect headers
+        java.util.Map<String, Object> nativeHeaders = (java.util.Map<String, Object>) headerAccessor.getMessageHeaders()
+                .get("nativeHeaders");
+        if (nativeHeaders != null && nativeHeaders.containsKey("username")) {
+            String username = ((java.util.List<String>) nativeHeaders.get("username")).get(0);
+            headerAccessor.getSessionAttributes().put("username", username);
+
+            Optional<User> userOpt = userRepository.findByUsername(username);
+            if (userOpt.isPresent()) {
+                User user = userOpt.get();
+                user.setOnline(true);
+                userRepository.save(user);
+                broadcastStatus(username, true);
+            }
+        }
+    }
 
     @EventListener
     public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+        String username = (String) headerAccessor.getSessionAttributes().get("username");
 
-        // Note: In a production app, we would store the username in the session
-        // attributes
-        // during connection to retrieve it here. For this implementation, we can handle
-        // it
-        // if user explicitly logs out or if we add session attributes in
-        // WebSocketConfig.
+        if (username != null) {
+            Optional<User> user = userRepository.findByUsername(username);
+            if (user.isPresent()) {
+                User u = user.get();
+                u.setOnline(false);
+                userRepository.save(u);
+                broadcastStatus(username, false);
+            }
+        }
+    }
 
-        // Simple approach: Any user object that was marked online but hasn't had
-        // heartbeat
-        // could be cleaned up. For now, we'll focus on explicit logout and basic
-        // disconnect handling.
+    private void broadcastStatus(String username, boolean online) {
+        java.util.Map<String, Object> statusUpdate = new java.util.HashMap<>();
+        statusUpdate.put("type", "STATUS_UPDATE");
+        statusUpdate.put("sender", username);
+        statusUpdate.put("online", online);
+        statusUpdate.put("timestamp", java.time.LocalDateTime.now().toString());
+
+        // Broadcast to all users (friends will filter on frontend)
+        messagingTemplate.convertAndSend("/topic/status", (Object) statusUpdate);
     }
 }

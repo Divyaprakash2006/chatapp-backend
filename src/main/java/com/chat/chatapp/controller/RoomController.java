@@ -88,4 +88,40 @@ public class RoomController {
         roomRepository.save(room);
         return ResponseEntity.ok(room);
     }
+
+    @PostMapping("/{id}/meeting/start")
+    public ResponseEntity<?> startMeeting(@PathVariable String id, @RequestParam String initiator, @RequestBody Set<String> invitedUsernames) {
+        Optional<Room> roomOpt = roomRepository.findById(id);
+        if (roomOpt.isEmpty())
+            return ResponseEntity.badRequest().body("Room not found");
+
+        Room room = roomOpt.get();
+        room.setMeetingActive(true);
+        room.setMeetingStartTime(System.currentTimeMillis());
+        room.setInvitedUsernames(invitedUsernames);
+        room.setInitiatorUsername(initiator);
+        roomRepository.save(room);
+        return ResponseEntity.ok(room);
+    }
+
+    @PostMapping("/{id}/meeting/end")
+    public ResponseEntity<?> endMeeting(@PathVariable String id) {
+        Optional<Room> roomOpt = roomRepository.findById(id);
+        if (roomOpt.isEmpty())
+            return ResponseEntity.badRequest().body("Room not found");
+
+        Room room = roomOpt.get();
+        room.setMeetingActive(false);
+        room.setMeetingStartTime(null);
+        room.setInvitedUsernames(new HashSet<>());
+        room.setInitiatorUsername(null);
+        roomRepository.save(room);
+        return ResponseEntity.ok(room);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteRoom(@PathVariable String id) {
+        roomRepository.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
 }

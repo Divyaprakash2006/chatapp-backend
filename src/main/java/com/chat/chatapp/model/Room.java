@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.util.Set;
 import java.util.HashSet;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -26,11 +27,26 @@ public class Room {
     private User owner;
 
     @DBRef
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Set<User> members = new HashSet<>();
 
-    private boolean aiEnabled = false;
+    @JsonProperty("members")
+    public void setMembersFromStubs(Set<User> stubs) {
+        if (stubs != null) {
+            this.members = stubs;
+        }
+    }
+
+    private Boolean aiEnabled = false;
     private String icon;
     private String category;
-    private String type = "COMMUNITY"; // COMMUNITY or GROUP
+    private String type = "GROUP"; // GROUP or PRIVATE
+
+    private Boolean meetingActive = false;
+    private Long meetingStartTime;
+    private Set<String> invitedUsernames = new HashSet<>();
+    private String initiatorUsername;
+
+    public boolean isAiEnabled() {
+        return aiEnabled != null && aiEnabled;
+    }
 }
