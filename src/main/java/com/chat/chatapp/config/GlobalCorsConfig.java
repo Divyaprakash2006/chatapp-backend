@@ -17,8 +17,8 @@ public class GlobalCorsConfig {
         // Allow credentials (necessary for SockJS)
         config.setAllowCredentials(true);
 
-        // Allow all origins, including 'null' for local files
-        config.addAllowedOriginPattern("*");
+        // Allow exact origins
+        config.addAllowedOrigin("http://localhost:5173");
 
         // Match headers and methods
         config.addAllowedHeader("*");
