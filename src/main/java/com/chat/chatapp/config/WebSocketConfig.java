@@ -12,10 +12,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // Allowing "null" origin explicitly for local file execution and "*" for
-        // general patterns
+        // Allowing "http://localhost:5173" origin explicitly for frontend
         registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns("*")
+                .setAllowedOrigins("http://localhost:5173")
                 .withSockJS();
     }
 
