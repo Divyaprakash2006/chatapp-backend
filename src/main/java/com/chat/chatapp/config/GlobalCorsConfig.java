@@ -18,7 +18,7 @@ public class GlobalCorsConfig {
         config.setAllowCredentials(true);
 
         // Allow exact origins
-        config.addAllowedOrigin("http://localhost:5173");
+        config.addAllowedOrigin("https://chatapp-kappa-one.vercel.app");
 
         // Match headers and methods
         config.addAllowedHeader("*");
