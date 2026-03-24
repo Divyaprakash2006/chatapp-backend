@@ -14,7 +14,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // Allowing "http://localhost:5173" origin explicitly for frontend
         registry.addEndpoint("/ws")
-                .setAllowedOrigins("http://localhost:5173")
+                .setAllowedOrigins("http://localhost:5173", "https://chatapp-kappa-one.vercel.app")
                 .withSockJS();
     }
 
